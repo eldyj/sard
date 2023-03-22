@@ -13,6 +13,7 @@ parser.add_argument('-a','--only-asm',dest="only_asm",action='store_true')
 args = parser.parse_args()
 ParseOptions.argsfix = args.argsfix
 ParseOptions.is_lib = args.is_lib
+
 src = args.source
 out = src.replace('.sard','').replace('.srd','').replace('.sa','')
 asm = out + '.asm'

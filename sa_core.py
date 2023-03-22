@@ -33,17 +33,17 @@ def add_bss(line):
     Data.bss += '    ' + line + '\n'
 
 def fn(name, arguments, return_var = False):
-    add_code(f";;;; fn {name}({', '.join(arguments)}){' -> ' + return_var if return_var else ''}")
+    #add_code(f";;;; fn {name}({', '.join(arguments)}){' -> ' + return_var if return_var else ''}")
 
     Data.fns[name] = len(arguments)
 
     if return_var:
         arguments_map[return_var] = 'rax'
-        add_code(f";; {return_var} = rax")
+        #add_code(f";; {return_var} = rax")
 
     for i in arguments:
         arguments_map[i] = Data.registers.pop(0)
-        add_code(f";; {i} = {arguments_map[i]}")
+        #add_code(f";; {i} = {arguments_map[i]}")
 
     add_code(f"{name}:")
 
@@ -92,7 +92,7 @@ def sa_elif(line, reverse=True):
     Data.elsif_qneeded = False
     sa_else()
     Data.elsif_queue[-1].append(Data.ifs_count)
-    sa_if(line,True)
+    sa_if(line,reverse)
     Data.elsif_qneeded = True
     #print(Data.elsif_queue)
 
@@ -150,7 +150,7 @@ def get_or_set_register(name):
         return arguments_map[name]
 
     arguments_map[name] = Data.registers.pop(0)
-    add_code(f";;  first definition of {name} (on {arguments_map[name]})")
+    #add_code(f";;  first definition of {name} (on {arguments_map[name]})")
     return arguments_map[name]
 
 def mv(name, value):
