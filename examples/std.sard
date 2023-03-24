@@ -9,8 +9,7 @@ end
 
 fn prn fd str str.len
 	pr
-	newline = "\n"
-	pr fd newline
+	pr fd "/n"
 end
 
 fn print str str.len
