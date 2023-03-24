@@ -96,17 +96,21 @@ def parse_call(inp):
 
     if ParseOptions.argsfix:
         parts.reverse()
-        for i in parts:
-            if i[0] == ":": returns_to = i[1:]
-            if i[0] == ":" or i.isnumeric(): continue
-            if get_register(i) != "rax": push(i)
+        #for i in parts:
+        #    if i[0] == ":":
+        #        returns_to = i[1:]
+        #        continue
+        #    if get_register(i) != "rax":
+        #        push(i)
 
         for i in parts:
-            if i[0] == ":": continue
+            if i[0] == ":":
+                continue
             push(i)
 
         for i in parts:
-            if i[0] == ":": continue
+            if i[0] == ":":
+                continue
             pop(fnargs.pop(0))
     else:
         for i in parts:
@@ -119,15 +123,55 @@ def parse_call(inp):
     add_code(f"    call {first}")
 
     if returns_to != False:
-        mv(returns_to, 'rax')
+        mv(get_or_set_register(returns_to), 'rax')
 
-    if ParseOptions.argsfix:
-        parts.reverse()
+    #if ParseOptions.argsfix:
+    #    parts.reverse()
 
-        for i in parts:
-            if i[0] == ":" or i.isnumeric(): continue
-            if get_register(i) != "rax":
-                pop(i)
+    #    for i in parts:
+    #        if get_register(i) != "rax":
+    #            pop(i)
+
+#def parse_call(inp):
+#    parts = inp.split()
+#    first = parts.pop(0)
+#    fnargs = ALL_REGISTERS[0:Data.fns[first]]
+#    returns_to = False
+#
+#    if ParseOptions.argsfix:
+#        parts.reverse()
+#        #for i in parts:
+#        #    if i[0] == ":": returns_to = i[1:]
+#        #    if i[0] == ":" or i.isnumeric(): continue
+#        #    if get_register(i) != "rax": push(i)
+#
+#        for i in parts:
+#            if i[0] == ":": continue
+#            push(i)
+#
+#        for i in parts:
+#            if i[0] == ":": continue
+#            pop(fnargs.pop(0))
+#    else:
+#        for i in parts:
+#            if i[0] == ":":
+#                returns_to = i[1:]
+#                break
+#            mv(fnargs.pop(0),i)
+#
+#
+#    add_code(f"    call {first}")
+#
+#    if returns_to != False:
+#        mv(returns_to, 'rax')
+#
+#    #if ParseOptions.argsfix:
+#    #    parts.reverse()
+#
+#    #    for i in parts:
+#    #        if i[0] == ":" or i.isnumeric(): continue
+#    #        if get_register(i) != "rax":
+#    #            pop(i)
 
 def sa_include(filename):
     prev_dirname = ParseOptions.current_dir

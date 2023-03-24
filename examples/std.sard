@@ -8,6 +8,7 @@ fn pr fd str strlen :written_count
 end
 
 fn prn fd str strlen :written_count
+	written = 0
 	pr :written
 	str = "\n"
 	strlen = 1
