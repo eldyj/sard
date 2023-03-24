@@ -1,3 +1,4 @@
+import re
 from sa_core import *
 
 end_queue = []
@@ -89,18 +90,22 @@ def expand_operation(input_str):
         parse_operation(f"{result} {operator}= {val}")
 
 def parse_call(inp):
-    parts = inp.split()
+    parts = re.findall(r'''("[^"]*"|'[^']*'|\S+)''', inp)
     first = parts.pop(0)
     fnargs = ALL_REGISTERS[0:Data.fns[first]]
     returns_to = False
 
-    if len(parts) < Data.fns[first]:
-        for i in parts:
+    for index,i in enumerate(parts):
+        if '"' in i:
+            i = new_str(i)
+            parts[index] = i
+            arguments_map[f"{i}.len"] = f"{i}_len"
+        if len(parts) < Data.fns[first]:
             tmp = f"{i}.len"
             if tmp in arguments_map:
                 parts.append(tmp)
 
-    print(parts)
+    #print(parts)
 
     if ParseOptions.argsfix:
         parts.reverse()

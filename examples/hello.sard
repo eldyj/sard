@@ -1,8 +1,6 @@
 include std.sard
 
 fn main
-	string = "Hello, World!"
-
-	println string
+	println "Hello, World!"
 	exit 0
 end
