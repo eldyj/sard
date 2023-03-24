@@ -97,11 +97,9 @@ def parse_call(inp):
     if ParseOptions.argsfix:
         parts.reverse()
         for i in parts:
-            if i[0] == ":":
-                returns_to = i[1:]
-                continue
-            if get_register(i) != "rax":
-                push(i)
+            if i[0] == ":": returns_to = i[1:]
+            if i[0] == ":" or i.isnumeric(): continue
+            if get_register(i) != "rax": push(i)
 
         for i in parts:
             if i[0] == ":": continue
@@ -127,9 +125,9 @@ def parse_call(inp):
         parts.reverse()
 
         for i in parts:
-            if i[0] == ":": continue
+            if i[0] == ":" or i.isnumeric(): continue
             if get_register(i) != "rax":
-                push(i)
+                pop(i)
 
 def sa_include(filename):
     prev_dirname = ParseOptions.current_dir
