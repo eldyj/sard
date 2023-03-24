@@ -5,6 +5,16 @@ end_queue = []
 class ParseOptions:
     argsfix = False
     is_lib = False
+    current_dir = ""
+
+def dirname(filename):
+    if "/" not in filename:
+        return ParseOptions.current_dir
+
+    tmp = filename.split('/')
+    tmp.pop()
+
+    return '/'.join(tmp)
 
 def parse_fn(input_str):
     parts = input_str.strip().split()
@@ -53,7 +63,7 @@ def parse_operation(input_str):
         push(val2)
         pop(val1)
         pop(val2)
-    elif operator == "=" or operator == ":=":
+    elif operator in {'=',':='}:
         if "-" in input_str or "+" in input_str or "*" in input_str or "/" in input_str:
             expand_operation(input_str)
             return
@@ -94,13 +104,11 @@ def parse_call(inp):
                 push(i)
 
         for i in parts:
-            if i[0] == ":":
-                continue
+            if i[0] == ":": continue
             push(i)
 
         for i in parts:
-            if i[0] == ":":
-                continue
+            if i[0] == ":": continue
             pop(fnargs.pop(0))
     else:
         for i in parts:
@@ -119,8 +127,19 @@ def parse_call(inp):
         parts.reverse()
 
         for i in parts:
+            if i[0] == ":": continue
             if get_register(i) != "rax":
                 push(i)
+
+def sa_include(filename):
+    prev_dirname = ParseOptions.current_dir
+    ParseOptions.current_dir = dirname(filename)
+
+    with open(prev_dirname + filename, "r") as f:
+        for i in f.read().split('\n'):
+            parse_line(i)
+
+    ParseOptions.current_dir = prev_dirname
 
 def parse_line(input_str):
     if len(input_str) == 0 or input_str[0] in {'#',';',''}: return
@@ -128,6 +147,7 @@ def parse_line(input_str):
     inp = input_str.strip()
 
     parts = inp.split()
+    if len(parts) < 1: return
     first = parts[0]
 
     if first == "fn":
@@ -150,6 +170,8 @@ def parse_line(input_str):
         sa_continue()
     elif first == "break":
         sa_break()
+    elif first == "include":
+        sa_include(inp[8:])
     elif first == "syscall":
         syscall(parts[1])
     elif first == "label":
