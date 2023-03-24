@@ -3,15 +3,20 @@ fn exit code
 	syscall 60
 end
 
-fn pr fd str strlen :written_count
+fn pr fd str str.len
 	syscall 1
 end
 
-fn prn fd str strlen :written_count
-	written = 0
-	pr :written
-	str = "\n"
-	strlen = 1
+fn prn fd str str.len
 	pr
-	written_count = written + 1
+	newline = "\n"
+	pr fd newline
+end
+
+fn print str str.len
+	pr 1 str
+end
+
+fn println str str.len
+	prn 1 str
 end

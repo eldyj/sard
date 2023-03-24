@@ -3,6 +3,6 @@ include std.sard
 fn main
 	string = "Hello, World!"
 
-	prn 1 string string.len
+	println string
 	exit 0
 end

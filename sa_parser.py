@@ -94,6 +94,14 @@ def parse_call(inp):
     fnargs = ALL_REGISTERS[0:Data.fns[first]]
     returns_to = False
 
+    if len(parts) < Data.fns[first]:
+        for i in parts:
+            tmp = f"{i}.len"
+            if tmp in arguments_map:
+                parts.append(tmp)
+
+    print(parts)
+
     if ParseOptions.argsfix:
         parts.reverse()
         #for i in parts:
