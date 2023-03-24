@@ -1,10 +1,9 @@
 include ../std/std.sard
 
 fn main
-	i = 0
-	while i < 10
-		i += 1
+	loop
+		println "infinite loop"
 	end
 
-	exit i
+	exit 0
 end

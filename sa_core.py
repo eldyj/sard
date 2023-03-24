@@ -18,7 +18,10 @@ class Data:
     elsif_qneeded = True
     elsif_queue = []
     endif_queue = []
+    endloop_queue = []
+    enddowhile_queue = []
     endwhile_queue = []
+    endfor_queue = []
     else_queue = []
     bss_buffers = {}
     data_buffers = []
@@ -112,6 +115,22 @@ def endif(val = True):
         #print(f"endif: {i}")
         label(f"c{i}{'r' if Data.else_queue.pop() else ''}e")
 
+def sa_loop():
+    label(f"l{Data.loops_count}")
+    Data.endloop_queue.append(Data.loops_count)
+
+def endloop():
+    goto(f"l{Data.endloop_queue.pop()}")
+
+def sa_dowhile(line):
+    label(f"l{Data.loops_count}")
+    Data.enddowhile_queue.append([Data.loops_count, line])
+    Data.loops_count += 1
+
+def enddowhile():
+    tmp = Data.enddowhile_queue.pop()
+    jif(f"l{tmp[0]} {tmp[1]}")
+
 def sa_while(line):
     jifn(f"l{Data.loops_count}e {line}")
     label(f"l{Data.loops_count}")
@@ -132,6 +151,34 @@ def endwhile():
     tmp = Data.endwhile_queue.pop()
     jif(f"l{tmp[0]} {tmp[1]}")
     label(f"l{tmp[0]}e")
+
+def sa_for(line):
+    src = line.split()
+    varname = src[0]
+    op      = src[1]
+
+    if op == ":":
+        initial = src[2]
+        final   = src[3]
+        step    = src[4]
+    elif op == "->":
+        initial = '0'
+        final   = src[2]
+        step    = '1'
+    else:
+        raise ValueError(f"operator {op} haven't any context in 'for' loops")
+
+    mv(varname, initial)
+    sa_while(f"{varname} < {final}")
+    push(varname)
+
+    Data.endfor_queue.append([varname, step])
+
+def endfor():
+    tmp = Data.endfor_queue.pop()
+    pop(tmp[0])
+    add(tmp[0],tmp[1])
+    endwhile()
 
 def get_register(name):
     if name in ALL_REGISTERS or name in Data.bss_buffers or name in Data.data_buffers:

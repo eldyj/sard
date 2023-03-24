@@ -1,0 +1,15 @@
+include ../std/std.sard
+
+fn main
+; var = 0; var < 3; var += 1
+	for i -> 3
+		println "this text will printed 3 times"
+	end
+
+; var : start end step
+	for i : 0 5 1
+		println "this text will printed 5 times"
+	end
+
+	exit 0
+end

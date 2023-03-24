@@ -1,0 +1,7 @@
+fn sum2 int1 int2 :result
+	result = int1 + int2
+end
+
+fn sub2 int1 int2 :result
+	result = int1 - int2
+end

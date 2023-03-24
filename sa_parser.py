@@ -228,9 +228,18 @@ def parse_line(input_str):
         sa_else()
     elif first == "elif" or first == "elun":
         sa_elif(inp[5:], first == "elif")
+    elif first == "loop":
+        end_queue.append(endloop)
+        sa_loop()
+    elif first == "dowhile":
+        end_queue.append(enddowhile)
+        sa_dowhile(inp[8:])
     elif first == "while":
         end_queue.append(endwhile)
         sa_while(inp[6:])
+    elif first == "for":
+        end_queue.append(endfor)
+        sa_for(inp[4:])
     elif first == "continue":
         sa_continue()
     elif first == "break":
