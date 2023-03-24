@@ -7,15 +7,18 @@ class ParseOptions:
     argsfix = False
     is_lib = False
     current_dir = ""
+    ignored_files = []
+    current_file = ""
 
 def dirname(filename):
+    #print(filename)
     if "/" not in filename:
         return ParseOptions.current_dir
 
     tmp = filename.split('/')
     tmp.pop()
 
-    return '/'.join(tmp)
+    return '/'.join(tmp) + '/'
 
 def parse_fn(input_str):
     parts = input_str.strip().split()
@@ -187,14 +190,21 @@ def parse_call(inp):
 #    #            pop(i)
 
 def sa_include(filename):
+    file = ParseOptions.current_dir + filename
+    #print(ParseOptions.ignored_files)
+    #print(file)
+    if file in ParseOptions.ignored_files: return
+    prev_filename = ParseOptions.current_file
     prev_dirname = ParseOptions.current_dir
-    ParseOptions.current_dir = dirname(filename)
+    ParseOptions.current_dir = dirname(file)
+    ParseOptions.current_file = file
 
     with open(prev_dirname + filename, "r") as f:
         for i in f.read().split('\n'):
             parse_line(i)
 
     ParseOptions.current_dir = prev_dirname
+    ParseOptions.current_file = prev_filename
 
 def parse_line(input_str):
     if len(input_str) == 0 or input_str[0] in {'#',';',''}: return
@@ -239,6 +249,9 @@ def parse_line(input_str):
         pop(parts[1])
     elif first == "end":
         end_queue.pop()()
+    elif first == "once":
+        #print(ParseOptions.current_file)
+        ParseOptions.ignored_files.append(ParseOptions.current_file)
     elif first in Data.fns:
         parse_call(inp)
     else:

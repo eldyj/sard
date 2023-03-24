@@ -1,4 +1,4 @@
-include std.sard
+include ../std/std.sard
 
 fn main
 	i = 0

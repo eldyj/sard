@@ -1,0 +1,4 @@
+fn exit code
+	rbx = code
+	syscall 60
+end

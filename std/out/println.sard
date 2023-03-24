@@ -1,0 +1,6 @@
+once
+include prn.sard
+
+fn println str str.len
+	prn 1 str
+end

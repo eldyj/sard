@@ -1,0 +1,4 @@
+once
+fn pr fd str str.len
+	syscall 1
+end

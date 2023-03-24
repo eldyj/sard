@@ -1,0 +1,7 @@
+once
+include pr.sard
+
+fn prn fd str str.len
+	pr
+	pr fd "\n"
+end
