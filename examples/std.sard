@@ -1,0 +1,16 @@
+fn exit code
+	rbx = code
+	syscall 60
+end
+
+fn pr fd str strlen :written_count
+	syscall 1
+end
+
+fn prn fd str strlen :written_count
+	pr :written
+	str = "\n"
+	strlen = 1
+	pr
+	written_count = written + 1
+end

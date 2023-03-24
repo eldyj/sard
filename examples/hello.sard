@@ -1,0 +1,8 @@
+include std.sard
+
+fn main
+	string = "Hello, World!"
+
+	prn 1 string string.len
+	exit 0
+end
