@@ -208,6 +208,8 @@ def parse_line(input_str):
         sa_else()
     elif first == "elif" or first == "elun":
         sa_elif(inp[5:], first == "elif")
+    elif first == "buf":
+        buf(inp[4:])
     elif first == "loop":
         end_queue.append(endloop)
         sa_loop()

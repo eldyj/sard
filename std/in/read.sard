@@ -1,0 +1,4 @@
+once
+fn read fd buf buf.len
+	syscall 0
+end

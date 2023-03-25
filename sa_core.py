@@ -14,6 +14,7 @@ class Data:
     registers = regs()
     fns={}
     str_literals_count = 0
+    bufs_count = 0
     ifs_count = 0
     loops_count = 0
     elsif_qneeded = True
@@ -24,7 +25,7 @@ class Data:
     endwhile_queue = []
     endfor_queue = []
     else_queue = []
-    bss_buffers = {}
+    buffers = []
     data_buffers = []
 
 def add_code(line):
@@ -32,9 +33,6 @@ def add_code(line):
 
 def add_data(line):
     Data.data += '    ' + line + '\n'
-
-def add_bss(line):
-    Data.bss += '    ' + line + '\n'
 
 def fn(name, arguments, return_var = False):
     Data.fns[name] = len(arguments)
@@ -173,7 +171,7 @@ def endfor():
     endwhile()
 
 def get_register(name):
-    if name in ALL_REGISTERS or name in Data.bss_buffers or name in Data.data_buffers:
+    if name in ALL_REGISTERS or name in Data.buffers or name in Data.data_buffers:
         return name
 
     if name in arguments_map:
@@ -182,10 +180,12 @@ def get_register(name):
     return name
 
 def get_or_set_register(name):
-    if name in ALL_REGISTERS or name in Data.bss_buffers or name in Data.data_buffers:
+    print(name)
+    if name in ALL_REGISTERS or name in Data.buffers or name in Data.data_buffers:
         return name
 
     if name in arguments_map:
+        print(arguments_map[name])
         return arguments_map[name]
 
     arguments_map[name] = Data.registers.pop(0)
@@ -252,20 +252,34 @@ def div(name, value):
 
     add_code(f"    div {get_register(name)}, {get_register(value)}")
 
-def add_str_const(name, text):
+def add_arr(name, text):
     add_data(f"{name} db {text}")
     add_data(f"{name}_len = $-{name}")
     Data.data_buffers.append(name)
 
+def str_escapes(text):
+    return text\
+            .replace("\\n",'",10,13,"')\
+            .replace("\\t",'",9,"')\
+            .replace("\\b",'",8,"')\
+            .replace("\\0",'",0,"')\
+            .replace("\\e",'",27,"')
+
 def new_str(text):
-    add_str_const(f"str{Data.str_literals_count}",text.replace("\\n",'",10,13,"'))
+    add_arr(f"str{Data.str_literals_count}",str_escapes(text))
     Data.str_literals_count += 1
     return f"str{Data.str_literals_count-1}"
 
-def buf(name, length):
-    add_bss(f"{name}: resb {length}")
-    add_data(f"{name}_len: equ {length}")
-    Data.bss_buffers[name] = length
+def buf(line):
+    src = line.split()
+    name = src[0]
+    length = src[1]
+    Data.buffers.append(f"b{Data.bufs_count}")
+    add_data(f"b{Data.bufs_count} rd {length}")
+    add_data(f"b{Data.bufs_count}_len equ {length}")
+    arguments_map[f"{name}.len"] = f"b{Data.bufs_count}_len"
+    arguments_map[name] = f"b{Data.bufs_count}"
+    Data.bufs_count += 1
 
 def push(var):
     add_code(f"    push {get_register(var)}")

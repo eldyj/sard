@@ -1,0 +1,6 @@
+once
+use in/read
+
+fn input buf buf.len
+	read 0 buf
+end
