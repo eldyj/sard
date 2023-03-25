@@ -24,6 +24,19 @@ def dirname(filename):
 
     return '/'.join(tmp) + '/'
 
+def remove_comments(line):
+  l = 0
+  s = False
+
+  for i in list(line):
+    if i == '"':
+      s = not s
+    if i in {';','#'} and not s:
+      break
+    l += 1
+
+  return line[:l]
+
 def parse_fn(input_str):
     parts = input_str.strip().split()
     name = parts[1]
@@ -162,7 +175,7 @@ def sa_include(filename):
 
     with open(prev_dirname + filename, "r") as f:
         for i in f.read().split('\n'):
-            parse_line(i)
+            parse_line(remove_comments(i))
 
     ParseOptions.current_dir = prev_dirname
     ParseOptions.current_file = prev_filename
@@ -174,12 +187,12 @@ def sa_use(filename):
     ParseOptions.current_dir = prev_dirname
 
 def parse_line(input_str):
-    if len(input_str) == 0 or input_str[0] in {'#',';',''}: return
-
     inp = input_str.strip()
+    if inp == '': return
 
     parts = inp.split()
-    if len(parts) < 1: return
+
+    if len(parts) == 0: return
     first = parts[0]
 
     if first == "fn":

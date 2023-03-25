@@ -1,5 +1,5 @@
 once
-include prn.sard
+use out/prn
 
 fn println str str.len
 	prn 1 str

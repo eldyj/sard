@@ -1,4 +1,3 @@
 once
-include out/print.sard
-include out/println.sard
-include sys/exit.sard
+use out
+use sys

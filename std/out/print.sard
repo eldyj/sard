@@ -1,4 +1,4 @@
-include pr.sard
+use out/pr
 
 fn print str str.len
 	pr 1 str
