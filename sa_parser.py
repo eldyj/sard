@@ -101,6 +101,10 @@ def expand_operation(input_str):
 def parse_call(inp):
     parts = re.findall(r'''("[^"]*"|'[^']*'|\S+)''', inp)
     first = parts.pop(0)
+
+    if first not in Data.fns:
+        raise ValueError(f"There is no function {first}")
+
     fnargs = ALL_REGISTERS[0:Data.fns[first]]
     returns_to = False
 
@@ -147,6 +151,10 @@ def parse_call(inp):
 def sa_include(filename):
     file = ParseOptions.current_dir + filename
     if file in ParseOptions.ignored_files: return
+
+    if ParseOptions.ignored_files == []:
+        ParseOptions.ignored_files.append(ParseOptions.entry)
+
     prev_filename = ParseOptions.current_file
     prev_dirname = ParseOptions.current_dir
     ParseOptions.current_dir = dirname(file)

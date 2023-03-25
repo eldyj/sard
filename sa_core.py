@@ -1,9 +1,10 @@
-regs = lambda: ['rdi','rsi','rdx','rcx','rbx','r8','r9','r10','r11','r12','r13','r14','r15','r16']
+regs = lambda: ['rdi','rsi','rdx','rcx','r8','r9','r10','r11','r12','r13','r14','r15','xmm0','xmm1','xmm2','xmm3','xmm4','xmm5','xmm6','xmm7']
 
 arguments_map = {}
 labels = []
 ALL_REGISTERS = regs()
 ALL_REGISTERS.append('rax')
+ALL_REGISTERS.append('rbx')
 neg_ops = {'=':'jne','==':'jne','!=':'je','~=':'je','<>':'je','>':'jng','<':'jnl','>=':'jnge','<=':'jnle'}
 pos_ops = {'=':'je','==':'je','!=':'jne','~=':'jne','<>':'jne','>':'jg','<':'jl','>=':'jge','<=':'jle'}
 
@@ -36,17 +37,13 @@ def add_bss(line):
     Data.bss += '    ' + line + '\n'
 
 def fn(name, arguments, return_var = False):
-    #add_code(f";;;; fn {name}({', '.join(arguments)}){' -> ' + return_var if return_var else ''}")
-
     Data.fns[name] = len(arguments)
 
     if return_var:
         arguments_map[return_var] = 'rax'
-        #add_code(f";; {return_var} = rax")
 
     for i in arguments:
         arguments_map[i] = Data.registers.pop(0)
-        #add_code(f";; {i} = {arguments_map[i]}")
 
     add_code(f"{name}:")
 
@@ -65,13 +62,11 @@ def goto(name):
 
 def jif(line):
     src = line.split()
-    #print(src)
     add_code(f"    cmp {get_register(src[1])}, {get_register(src[3])}")
     add_code(f"    {pos_ops[src[2]]} .{src[0]}")
 
 def jifn(line):
     src = line.split()
-    #print(src)
     add_code(f"    cmp {get_register(src[1])}, {get_register(src[3])}")
     add_code(f"    {neg_ops[src[2]]} .{src[0]}")
 
@@ -85,7 +80,6 @@ def sa_if(line, reverse=True):
     Data.ifs_count += 1
 
 def sa_else():
-    #print(f"else: {Data.ifs_count - 1}")
     goto(f"c{Data.ifs_count - 1}re")
     label(f"c{Data.endif_queue[-1]}e")
     Data.else_queue.pop()
@@ -97,11 +91,9 @@ def sa_elif(line, reverse=True):
     Data.elsif_queue[-1].append(Data.ifs_count)
     sa_if(line,reverse)
     Data.elsif_qneeded = True
-    #print(Data.elsif_queue)
 
 def endif(val = True):
     if val:
-        #print(Data.elsif_queue)
         tmp = Data.elsif_queue.pop()
         tmp.reverse()
         if len(tmp) > 0:
@@ -282,11 +274,5 @@ def pop(var):
     add_code(f"    pop {get_or_set_register(var)}")
 
 def syscall(number):
-    #if 'rax' in arguments_map.values():
-    #    push('rax')
-
     mv('rax',number)
     add_code('    syscall')
-
-    #if 'rax' in arguments_map.values():
-    #    pop('rax')

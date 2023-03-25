@@ -21,7 +21,7 @@ obj = out + '.o'
 fasm_format = f"format ELF64{'' if args.is_lib else ' executable'}"
 
 ParseOptions.current_file = src
-ParseOptions.ignored_files.append(src)
+#ParseOptions.ignored_files.append(src)
 ParseOptions.entry = args.entry
 
 if not args.is_lib:
@@ -29,31 +29,28 @@ if not args.is_lib:
     Data.code += f"entry {args.entry}\n"
     Data.data = "segment readable executable\n"
 
-with open(src,"r") as f:
-    for i in f.read().split("\n"):
-        parse_line(i)
-    print(f"parsed `{src}`")
+sa_include(src)
 
 with open(asm,"w") as f:
     f.write(f"{fasm_format}\n{Data.data}\n{Data.code}")
 
 if args.only_asm:
-    print(f"code written to `{asm}`")
+    print(f"assembly written to `{asm}`")
     exit(0)
 
-shell_exec(["fasm", asm])
+shell_exec(["fasm", asm],check=True)
 
 if args.is_lib:
     if args.output and args.output != obj:
             shell_exec(["mv",obj,args.output])
 
-    print(f"written to `{args.output if args.output else obj}`")
+    print(f"library written to `{args.output if args.output else obj}`")
 else:
     shell_exec(["chmod","+x",out])
     if args.output and args.output != out:
         shell_exec(["mv",out,args.output])
 
-    print(f"written to `{args.output if args.output else out}`")
+    print(f"executable written to `{args.output if args.output else out}`")
 
 shell_exec(["rm",asm], check=True)
-print(f"removed `{asm}`")
+print(f"removed compilation-time assembly ({asm})")
