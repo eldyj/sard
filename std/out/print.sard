@@ -1,3 +1,4 @@
+once
 use out/pr
 
 fn print str str.len
