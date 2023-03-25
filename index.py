@@ -15,7 +15,7 @@ ParseOptions.argsfix = args.argsfix
 ParseOptions.is_lib = args.is_lib
 
 src = args.source
-out = src.replace('.sard','').replace('.srd','').replace('.sa','')
+out = src.replace('.sard','').replace('.srd','')
 asm = out + '.asm'
 obj = out + '.o'
 fasm_format = f"format ELF64{'' if args.is_lib else ' executable'}"
