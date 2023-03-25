@@ -22,6 +22,7 @@ fasm_format = f"format ELF64{'' if args.is_lib else ' executable'}"
 
 ParseOptions.current_file = src
 ParseOptions.ignored_files.append(src)
+ParseOptions.entry = args.entry
 
 if not args.is_lib:
     Data.code = "segment readable executable\n"

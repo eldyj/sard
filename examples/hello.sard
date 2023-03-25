@@ -2,5 +2,4 @@ include ../std/std.sard
 
 fn main
 	println "Hello, World!"
-	exit 0
 end

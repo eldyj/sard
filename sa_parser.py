@@ -9,9 +9,13 @@ class ParseOptions:
     current_dir = ""
     ignored_files = []
     current_file = ""
+    entry = ""
+
+class ParserData:
+    lastfn_name = ""
+    lastfn_exit = False
 
 def dirname(filename):
-    #print(filename)
     if "/" not in filename:
         return ParseOptions.current_dir
 
@@ -25,6 +29,8 @@ def parse_fn(input_str):
     name = parts[1]
     arguments = []
     return_var = False
+    ParserData.lastfn_name = name
+    ParserData.lastfn_exit = False
 
     for part in parts[2:]:
         if part.startswith(":"):
@@ -98,6 +104,12 @@ def parse_call(inp):
     fnargs = ALL_REGISTERS[0:Data.fns[first]]
     returns_to = False
 
+    if not ParserData.lastfn_exit:
+        print(end_queue)
+        if ParserData.lastfn_name == ParseOptions.entry and first == "exit":
+            if len(end_queue) == 0 or end_queue[-1] == endfn:
+                ParserData.lastfn_exit = True
+
     for index,i in enumerate(parts):
         if '"' in i:
             i = new_str(i)
@@ -108,16 +120,8 @@ def parse_call(inp):
             if tmp in arguments_map:
                 parts.append(tmp)
 
-    #print(parts)
-
     if ParseOptions.argsfix:
         parts.reverse()
-        #for i in parts:
-        #    if i[0] == ":":
-        #        returns_to = i[1:]
-        #        continue
-        #    if get_register(i) != "rax":
-        #        push(i)
 
         for i in parts:
             if i[0] == ":":
@@ -141,58 +145,8 @@ def parse_call(inp):
     if returns_to != False:
         mv(get_or_set_register(returns_to), 'rax')
 
-    #if ParseOptions.argsfix:
-    #    parts.reverse()
-
-    #    for i in parts:
-    #        if get_register(i) != "rax":
-    #            pop(i)
-
-#def parse_call(inp):
-#    parts = inp.split()
-#    first = parts.pop(0)
-#    fnargs = ALL_REGISTERS[0:Data.fns[first]]
-#    returns_to = False
-#
-#    if ParseOptions.argsfix:
-#        parts.reverse()
-#        #for i in parts:
-#        #    if i[0] == ":": returns_to = i[1:]
-#        #    if i[0] == ":" or i.isnumeric(): continue
-#        #    if get_register(i) != "rax": push(i)
-#
-#        for i in parts:
-#            if i[0] == ":": continue
-#            push(i)
-#
-#        for i in parts:
-#            if i[0] == ":": continue
-#            pop(fnargs.pop(0))
-#    else:
-#        for i in parts:
-#            if i[0] == ":":
-#                returns_to = i[1:]
-#                break
-#            mv(fnargs.pop(0),i)
-#
-#
-#    add_code(f"    call {first}")
-#
-#    if returns_to != False:
-#        mv(returns_to, 'rax')
-#
-#    #if ParseOptions.argsfix:
-#    #    parts.reverse()
-#
-#    #    for i in parts:
-#    #        if i[0] == ":" or i.isnumeric(): continue
-#    #        if get_register(i) != "rax":
-#    #            pop(i)
-
 def sa_include(filename):
     file = ParseOptions.current_dir + filename
-    #print(ParseOptions.ignored_files)
-    #print(file)
     if file in ParseOptions.ignored_files: return
     prev_filename = ParseOptions.current_file
     prev_dirname = ParseOptions.current_dir
@@ -257,9 +211,13 @@ def parse_line(input_str):
     elif first == "pop":
         pop(parts[1])
     elif first == "end":
-        end_queue.pop()()
+        tmp = end_queue.pop()
+        if tmp == endfn:
+            if ParserData.lastfn_name == ParseOptions.entry:
+                if not ParserData.lastfn_exit:
+                    parse_call('exit 0')
+        tmp()
     elif first == "once":
-        #print(ParseOptions.current_file)
         ParseOptions.ignored_files.append(ParseOptions.current_file)
     elif first in Data.fns:
         parse_call(inp)

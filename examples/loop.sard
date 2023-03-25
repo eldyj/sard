@@ -4,6 +4,4 @@ fn main
 	loop
 		println "infinite loop"
 	end
-
-	exit 0
 end
