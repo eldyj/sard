@@ -105,7 +105,6 @@ def parse_call(inp):
     returns_to = False
 
     if not ParserData.lastfn_exit:
-        print(end_queue)
         if ParserData.lastfn_name == ParseOptions.entry and first == "exit":
             if len(end_queue) == 0 or end_queue[-1] == endfn:
                 ParserData.lastfn_exit = True
@@ -160,6 +159,12 @@ def sa_include(filename):
     ParseOptions.current_dir = prev_dirname
     ParseOptions.current_file = prev_filename
 
+def sa_use(filename):
+    prev_dirname = ParseOptions.current_dir
+    ParseOptions.current_dir = dirname(__file__)
+    sa_include(f"std/{filename}.sard")
+    ParseOptions.current_dir = prev_dirname
+
 def parse_line(input_str):
     if len(input_str) == 0 or input_str[0] in {'#',';',''}: return
 
@@ -200,6 +205,8 @@ def parse_line(input_str):
         sa_break()
     elif first == "include":
         sa_include(inp[8:])
+    elif first == "use":
+        sa_use(inp[4:])
     elif first == "syscall":
         syscall(parts[1])
     elif first == "label":
